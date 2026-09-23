@@ -1,0 +1,19 @@
+{
+  "name": "sharecar-backend",
+  "version": "1.0.0",
+  "description": "ShareCar India — PostgreSQL Backend API with ACID Transaction Engine",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": ["carpool", "dbms", "postgresql", "3nf", "acid", "express"],
+  "author": "ShareCar",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "pg": "^8.11.5"
+  }
+}

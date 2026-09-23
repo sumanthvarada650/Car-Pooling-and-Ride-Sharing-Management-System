@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ShareCar India — Smart, affordable carpooling across Indian expressways and city tech corridors. FASTag-enabled, Aadhaar verified, and powered by a PostgreSQL relational database.">
+    <title>ShareCar — Intercity &amp; City Carpooling across India</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚗</text></svg>">
+</head>
+<body>
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="header" id="mainHeader">
+        <a href="#" class="brand-wrapper">
+            <div class="brand-icon">🚗</div>
+            <div>
+                <div class="brand-title">Share<span>Car</span></div>
+                <div class="brand-tagline">Ride Together · Split Costs · Save More</div>
+            </div>
+        </a>
+
+        <nav class="main-nav">
+            <a href="#rides-section" class="nav-link">Find Rides</a>
+            <a href="#how-it-works" class="nav-link">How it Works</a>
+            <a href="#trust-section" class="nav-link">Safety &amp; KYC</a>
+            <a href="#commuter-stories" class="nav-link">Stories</a>
+        </nav>
+
+        <div class="nav-actions">
+            <button class="btn-publish-ride" id="btnOpenPublishModal">
+                <span>➕</span> Publish a ride
+            </button>
+            <button class="btn-dbms-badge" id="btnOpenPgConsole" title="PostgreSQL Database Inspector">
+                <span>🐘</span> DB Console
+            </button>
+            <div class="user-profile-badge" id="btnUserMenu" title="Your Passenger Profile (Aadhaar KYC Verified)">
+                <div class="user-avatar-circle" id="headerUserAvatar">AV</div>
+                <div class="user-info-text">
+                    <div class="user-name" id="headerUserName">Aryan Verma</div>
+                    <div class="user-balance" id="headerUserBalance">₹1,450.00</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="hero-badge-dot"></span>
+                🇮🇳 2M+ commuters across Indian expressways &amp; cities trust ShareCar
+            </div>
+            <h1 class="hero-title">Your Pick of Rides<br>at Low Prices.</h1>
+            <p class="hero-subtitle">Connect with verified vehicle owners travelling your way on National Expressways, State Highways, and Daily IT Corridors. Safe, affordable, FASTag-enabled, and backed by a real-time PostgreSQL database.</p>
+        </div>
+
+        <!-- Search Widget -->
+        <div class="search-widget-container" id="rides-section">
+            <div class="search-field">
+                <span class="search-field-icon">○</span>
+                <div class="search-input-group">
+                    <label class="search-label">Leaving from</label>
+                    <input type="text" class="search-input" id="searchLeavingFrom" placeholder="City, Metro or Toll (e.g. Mumbai, Dadar, BKC)">
+                </div>
+            </div>
+
+            <div class="search-divider">
+                <button class="swap-btn" id="btnSwapLocations" title="Swap pickup & drop locations">⇆</button>
+            </div>
+
+            <div class="search-field">
+                <span class="search-field-icon">📍</span>
+                <div class="search-input-group">
+                    <label class="search-label">Going to</label>
+                    <input type="text" class="search-input" id="searchGoingTo" placeholder="City, Tech Park or Toll (e.g. Pune, Wakad, Hinjawadi)">
+                </div>
+            </div>
+
+            <div class="search-field" style="max-width: 170px;">
+                <span class="search-field-icon">📅</span>
+                <div class="search-input-group">
+                    <label class="search-label">Departure</label>
+                    <input type="text" class="search-input" id="searchDate" value="Today" readonly>
+                </div>
+            </div>
+
+            <div class="search-field" style="max-width: 170px;">
+                <span class="search-field-icon">👤</span>
+                <div class="search-input-group">
+                    <label class="search-label">Passengers</label>
+                    <select class="search-input" id="searchSeats">
+                        <option value="1">1 Seat</option>
+                        <option value="2">2 Seats</option>
+                        <option value="3">3 Seats</option>
+                        <option value="4">4+ Seats</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn-search-cta" id="btnPerformSearch">
+                <span>🔍</span> Search Rides
+            </button>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="category-tabs-bar">
+            <button class="category-tab-btn active" data-category="all" id="tabCatAll">
+                <span>🌐</span> All Rides <span class="category-badge" id="badgeCountAll">0</span>
+            </button>
+            <button class="category-tab-btn" data-category="intercity" id="tabCatIntercity">
+                <span>🚗</span> Highway &amp; Intercity <span class="category-badge" id="badgeCountIntercity">0</span>
+            </button>
+            <button class="category-tab-btn" data-category="within_city" id="tabCatWithinCity">
+                <span>⚡</span> Daily City Commute <span class="category-badge" id="badgeCountWithinCity">0</span>
+            </button>
+            <button class="category-tab-btn" data-category="ladies_only" id="tabCatLadies">
+                <span>👩</span> Ladies Only <span class="category-badge" id="badgeCountLadies">0</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content" id="main">
+        <!-- LEFT: Rides List -->
+        <section class="rides-section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title" id="ridesListTitle">Available Carpool Rides</h2>
+                    <p class="section-subtitle" id="ridesCountSummary">Verified trips with open seats, FASTag and AC</p>
+                </div>
+                <div class="section-controls">
+                    <select class="form-select sort-select" id="sortRidesSelect">
+                        <option value="earliest">Earliest Departure</option>
+                        <option value="price_asc">Price: Low to High (₹)</option>
+                        <option value="rating_desc">Highest Rated Driver (★)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="rides-list" id="ridesContainer">
+                <div style="text-align:center;padding:3rem;color:var(--bbc-text-sub);">Loading verified rides...</div>
+            </div>
+        </section>
+
+        <!-- RIGHT: Sidebar -->
+        <aside class="sidebar">
+            <!-- Passenger Wallet -->
+            <div class="sidebar-box wallet-box">
+                <div class="wallet-card-header">
+                    <div>
+                        <div class="wallet-label">ShareCar UPI Wallet</div>
+                        <div class="wallet-amount" id="sidebarWalletBalance">₹1,450.00</div>
+                    </div>
+                    <div class="wallet-icon-bg">💳</div>
+                </div>
+                <p class="wallet-desc">Zero commission, instant auto-refunds to Google Pay &amp; PhonePe UPI handles.</p>
+                <button class="btn-topup" id="btnQuickTopUp">
+                    <span>➕</span> Add ₹500 via UPI
+                </button>
+            </div>
+
+            <!-- Popular Routes -->
+            <div class="sidebar-box">
+                <h3 class="sidebar-title">🔥 Top Indian Corridors</h3>
+                <div class="popular-routes" id="popularRoutes"></div>
+            </div>
+
+            <!-- Trust Signals -->
+            <div class="sidebar-box" id="trust-section">
+                <h3 class="sidebar-title">Why travel with ShareCar?</h3>
+                <div class="trust-item">
+                    <div class="trust-icon">🆔</div>
+                    <div>
+                        <div class="trust-title">Aadhaar &amp; RTO DL Verified</div>
+                        <div class="trust-desc">Every driver's identity and driving license checked via Parivahan Sewa database.</div>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon">🛣️</div>
+                    <div>
+                        <div class="trust-title">FASTag Toll Sharing</div>
+                        <div class="trust-desc">Automatic toll splitting on national expressways — zero cash hassles at toll plazas.</div>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon">👩</div>
+                    <div>
+                        <div class="trust-title">Ladies-Only Carpool Option</div>
+                        <div class="trust-desc">Safe, dedicated carpools for female passengers travelling with verified women drivers.</div>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon">☕</div>
+                    <div>
+                        <div class="trust-title">Highway Dhaba &amp; Chai Breaks</div>
+                        <div class="trust-desc">Punctual 20-minute planned refreshment halts at verified expressway food malls.</div>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon">🐘</div>
+                    <div>
+                        <div class="trust-title">PostgreSQL ACID Engine</div>
+                        <div class="trust-desc">3NF relational integrity guarantees atomic seat lock with zero double-booking.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="sidebar-box">
+                <h3 class="sidebar-title">📋 Live Activity &amp; Bookings</h3>
+                <div id="recentActivity" class="recent-activity"></div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- HOW IT WORKS SECTION -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="how-it-works-inner">
+            <h2 class="section-heading-centered">How ShareCar Works</h2>
+            <p class="section-subheading">Book or publish a ride across Indian expressways and tech corridors in minutes. Powered by a PostgreSQL ACID relational engine.</p>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">🔍</div>
+                    <h3 class="step-title">Search Highway Route</h3>
+                    <p class="step-desc">Enter your pickup point at iconic landmarks (Toll Plazas, Metro Stations, or Highway Flyovers). Pick your date and required seats.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">🪪</div>
+                    <h3 class="step-title">Check Driver KYC &amp; Car</h3>
+                    <p class="step-desc">Inspect Aadhaar verification, RTO registration, car model (Ertiga CNG, Innova Crysta, Nexon EV), and fellow traveler ratings.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">⚡</div>
+                    <h3 class="step-title">Instant UPI Booking</h3>
+                    <p class="step-desc">Atomic PostgreSQL transaction locks your seat instantly with zero overbooking. Pay via Google Pay, PhonePe, or ShareCar Wallet.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">☕</div>
+                    <h3 class="step-title">Chai Halt &amp; Enjoy Ride</h3>
+                    <p class="step-desc">Meet your driver at the landmark, enjoy a 20-minute highway dhaba tea break, split fuel costs, and travel comfortably.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMMUTER STORIES SECTION -->
+    <section class="commuter-stories-section" id="commuter-stories">
+        <div class="stories-inner">
+            <h2 class="section-heading-centered">Real Stories from Indian Commuters</h2>
+            <p class="section-subheading">See how daily tech commuters and highway travellers save money and make friends across India.</p>
+            <div class="stories-grid">
+                <div class="story-card">
+                    <div>
+                        <div class="story-route-badge">🚗 Mumbai ➔ Pune Expressway</div>
+                        <p class="story-quote">"I travel between BKC and Pune Hinjawadi every Friday. ShareCar saves me ₹1,200 compared to private cabs! Travelling in an Innova Crysta with a chai halt at the Expressway Food Mall is super comfortable."</p>
+                    </div>
+                    <div class="story-author">
+                        <div class="story-avatar">RM</div>
+                        <div class="story-meta">
+                            <h4>Rohan Mehta</h4>
+                            <p>Software Architect, Hinjawadi Phase 1</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="story-card">
+                    <div>
+                        <div class="story-route-badge">⚡ Bengaluru IT Corridor</div>
+                        <p class="story-quote">"Daily commute from Whitefield ITPL to Koramangala used to be exhausting. Carpooling in a Nexon EV halved my monthly commute expense and beat the Silk Board traffic stress."</p>
+                    </div>
+                    <div class="story-author">
+                        <div class="story-avatar">AI</div>
+                        <div class="story-meta">
+                            <h4>Ananya Iyer</h4>
+                            <p>Product Manager, Whitefield</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="story-card">
+                    <div>
+                        <div class="story-route-badge">🚗 Delhi ➔ Jaipur Expressway</div>
+                        <p class="story-quote">"Took the new Delhi-Mumbai Expressway for a weekend trip to Jaipur. Driver arrived punctually at CP Rajiv Chowk. Chilled AC, smooth driving, and breakfast parathas on the highway!"</p>
+                    </div>
+                    <div class="story-author">
+                        <div class="story-avatar">AS</div>
+                        <div class="story-meta">
+                            <h4>Arjun Singh</h4>
+                            <p>Management Consultant, Delhi NCR</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="story-card">
+                    <div>
+                        <div class="story-route-badge">👩 Ladies-Only Carpool</div>
+                        <p class="story-quote">"The Ladies-Only carpool option gave my parents complete peace of mind when I booked a ride from Chennai CMBT to Pondicherry. 100% verified, clean car and very respectful co-passengers."</p>
+                    </div>
+                    <div class="story-author">
+                        <div class="story-avatar">DN</div>
+                        <div class="story-meta">
+                            <h4>Divya Nair</h4>
+                            <p>UX Designer, Chennai</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS SECTION -->
+    <section class="stats-section">
+        <div class="stats-inner">
+            <div class="stat-item">
+                <div class="stat-number">2M+</div>
+                <div class="stat-label">Registered Indian Members</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">50K+</div>
+                <div class="stat-label">Daily Rides on Expressways</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">₹850</div>
+                <div class="stat-label">Avg. Savings per Trip</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">99.4%</div>
+                <div class="stat-label">Passenger Safety Rating</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL: BOOK SEATS -->
+    <div class="modal-backdrop" id="modalBookSeats">
+        <div class="modal-box">
+            <button class="modal-close-btn" id="btnCloseBookModal" aria-label="Close">&times;</button>
+            <h3 class="modal-title">Confirm Seat Reservation</h3>
+            <p class="modal-subtitle">Reserve your seat with atomic PostgreSQL payment processing &amp; instant UPI confirmation.</p>
+
+            <div id="bookingRideSummary" class="booking-summary-box"></div>
+
+            <div id="bookingFormControls">
+                <div class="form-group">
+                    <label class="form-label">Number of Seats to Reserve</label>
+                    <div class="seat-selector-bar">
+                        <div>
+                            <div style="font-weight: 700; color: var(--bbc-dark);" id="modalSeatsCountLabel">1 Seat</div>
+                            <div style="font-size: 0.8rem; color: var(--bbc-text-sub);" id="modalSeatsMaxLabel">Max available: 3</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <button type="button" class="btn-stepper" id="btnSeatMinus">−</button>
+                            <span style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; min-width: 24px; text-align: center;" id="modalSeatValue">1</span>
+                            <button type="button" class="btn-stepper" id="btnSeatPlus">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fare-total-row">
+                    <span class="fare-label">Total Booking Fare (FASTag Included):</span>
+                    <span class="fare-value" id="modalTotalFare">₹350.00</span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label class="form-label">Payment Method</label>
+                    <select class="form-select" id="bookingPaymentMethodSelect">
+                        <option value="wallet" selected>ShareCar UPI Wallet (Balance: ₹1,450.00)</option>
+                        <option value="gpay">Google Pay UPI (@oksbi)</option>
+                        <option value="phonepe">PhonePe UPI (@ybl)</option>
+                        <option value="paytm">Paytm UPI / Wallet</option>
+                        <option value="netbanking">Net Banking (HDFC / SBI / ICICI)</option>
+                    </select>
+                </div>
+
+                <button type="button" class="btn-confirm-booking" id="btnConfirmBooking">
+                    <span>⚡</span> Confirm &amp; Reserve via PostgreSQL ACID
+                </button>
+            </div>
+
+            <!-- Persistent ACID Transaction Log Terminal -->
+            <div id="bookingAcidContainer" style="display: none; margin-top: 1rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                    <span style="font-size:0.82rem; font-weight:700; color:var(--bbc-dark); display:flex; align-items:center; gap:0.4rem;">
+                        <span>🐘</span> PostgreSQL ACID Execution Trace
+                    </span>
+                    <span style="font-size:0.75rem; color:#059669; font-weight:700; background:#ECFDF5; padding:0.15rem 0.5rem; border-radius:99px; border:1px solid #A7F3D0;">
+                        ✓ COMMITTED
+                    </span>
+                </div>
+                <div class="acid-log-stepper" id="modalAcidLog" style="max-height: 240px; overflow-y: auto;"></div>
+            </div>
+
+            <!-- Post-Booking Actions (Stays Still & Interactive) -->
+            <div id="bookingSuccessActions" style="display: none; margin-top: 1.25rem;">
+                <div class="booking-success-banner" style="background:#ECFDF5; border:1px solid #A7F3D0; border-radius:var(--radius-sm); padding:0.85rem 1rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.75rem;">
+                    <span style="font-size:1.6rem; line-height:1;">✅</span>
+                    <div>
+                        <strong style="color:#065F46; font-size:0.95rem; display:block;">Booking Confirmed &amp; Committed!</strong>
+                        <span style="color:#047857; font-size:0.82rem;" id="bookingSuccessDetails">Seat reserved · 3NF relational integrity verified.</span>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+                    <button type="button" class="btn-copy-sql" id="btnCopyAcidSql" style="flex:1; min-width:160px; padding:0.75rem 1rem; border-radius:var(--radius-sm); font-weight:700; font-size:0.85rem; background:#F1F5F9; border:1px solid var(--bbc-border); color:var(--bbc-dark); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:0.35rem; transition:var(--transition);">
+                        <span>📋</span> Copy ACID SQL Log
+                    </button>
+                    <button type="button" class="btn-view-db" id="btnViewBookingInDb" style="flex:1; min-width:160px; padding:0.75rem 1rem; border-radius:var(--radius-sm); font-weight:700; font-size:0.85rem; background:var(--bbc-blue-soft); border:1px solid var(--bbc-blue); color:var(--bbc-blue-deep); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:0.35rem; transition:var(--transition);">
+                        <span>🐘</span> View in DB Console
+                    </button>
+                    <button type="button" class="btn-done-modal" id="btnDoneBooking" style="width:100%; padding:0.85rem 1rem; border-radius:var(--radius-sm); font-weight:800; font-size:0.95rem; background:var(--bbc-dark); border:none; color:white; cursor:pointer; margin-top:0.25rem; transition:var(--transition);">
+                        Done &amp; Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PUBLISH A RIDE (Driver Flow) -->
+    <div class="modal-backdrop" id="modalPublishRide">
+        <div class="modal-box modal-box-lg">
+            <button class="modal-close-btn" id="btnClosePublishModal" aria-label="Close">&times;</button>
+            <h3 class="modal-title">Publish a Carpool Ride</h3>
+            <p class="modal-subtitle">Offer empty seats on your journey, split travel &amp; FASTag toll costs with verified passengers.</p>
+
+            <form id="formPublishRide">
+                <div class="form-group">
+                    <label class="form-label">Ride Category</label>
+                    <div class="ride-category-selector">
+                        <label class="cat-radio-btn">
+                            <input type="radio" name="pubCategoryRadio" value="intercity" checked>
+                            <span class="cat-radio-inner">
+                                <span class="cat-radio-icon">🚗</span>
+                                <strong>Highway &amp; Intercity</strong>
+                                <small>Expressway city-to-city</small>
+                            </span>
+                        </label>
+                        <label class="cat-radio-btn">
+                            <input type="radio" name="pubCategoryRadio" value="within_city">
+                            <span class="cat-radio-inner">
+                                <span class="cat-radio-icon">⚡</span>
+                                <strong>Daily City Commute</strong>
+                                <small>IT Parks &amp; Metro routes</small>
+                            </span>
+                        </label>
+                    </div>
+                    <input type="hidden" id="pubCategory" value="intercity">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Leaving From (Origin Landmark)</label>
+                        <select class="form-select" id="pubOrigin"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Going To (Destination Landmark)</label>
+                        <select class="form-select" id="pubDestination"></select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Departure Time</label>
+                        <input type="text" class="form-input" id="pubDepartureTime" placeholder="e.g. Today, 06:30 PM" value="Today, 05:30 PM" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Highway / Route</label>
+                        <input type="text" class="form-input" id="pubRouteVia" placeholder="e.g. via Mumbai-Pune Expressway" value="via National Expressway">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Driver (Aadhaar &amp; RTO Verified)</label>
+                        <select class="form-select" id="pubDriver"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fuel &amp; Vehicle Type</label>
+                        <select class="form-select" id="pubFuel">
+                            <option value="CNG Green">CNG Green (Eco)</option>
+                            <option value="Diesel AC" selected>Diesel AC (Highway)</option>
+                            <option value="Electric EV">Electric EV (Zero Emission)</option>
+                            <option value="Petrol AC">Petrol AC (Smooth)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label class="form-label">Available Seats</label>
+                        <input type="number" class="form-input" id="pubSeats" min="1" max="7" value="3" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Price per Seat (₹)</label>
+                        <input type="number" class="form-input" id="pubPrice" min="10" step="5" value="350" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Luggage / Dicky Space</label>
+                        <select class="form-select" id="pubLuggage">
+                            <option value="Small Bag / Backpack">Small Bag / Backpack</option>
+                            <option value="Medium (1 Trolley Bag)" selected>Medium (1 Trolley Bag)</option>
+                            <option value="Large (Suitcase in Dicky)">Large (Suitcase in Dicky)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 0.5rem;">
+                    <label style="display:flex; align-items:center; gap: 0.65rem; font-size: 0.88rem; font-weight: 600; cursor: pointer;">
+                        <input type="checkbox" id="pubLadiesOnly">
+                        <span>👩 Ladies-Only Carpool (Female passengers only)</span>
+                    </label>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="btnCancelPublish">Cancel</button>
+                    <button type="submit" class="btn-confirm-booking" style="width: auto; padding: 0.85rem 2rem;">
+                        <span>🚀</span> Publish Ride
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: POSTGRESQL DBMS CONSOLE -->
+    <div class="modal-backdrop" id="modalPgConsole">
+        <div class="modal-box pg-console-modal">
+            <button class="modal-close-btn" id="btnClosePgModal" aria-label="Close">&times;</button>
+            <div class="pg-console-header">
+                <div style="display:flex; align-items:center; gap: 0.75rem;">
+                    <div style="font-size:2rem;">🐘</div>
+                    <div>
+                        <h3 class="modal-title" style="margin-bottom: 0;">PostgreSQL Database Inspector</h3>
+                        <p class="modal-subtitle">Browse 3NF relational tables, inspect Aadhaar KYC, RTO DL constraints, and UPI transaction ledgers.</p>
+                    </div>
+                </div>
+                <button class="btn-export-sql" id="btnDownloadPgDump">
+                    💾 Export .sql Dump
+                </button>
+            </div>
+
+            <div class="pg-toolbar">
+                <label class="form-label" style="margin:0; white-space:nowrap;">Select Relation:</label>
+                <select class="form-select" id="selectPgTable" style="width: 280px;">
+                    <option value="carpool_ride">carpool_ride (Expressways &amp; City Commutes)</option>
+                    <option value="ride_booking">ride_booking (Seat Reservations)</option>
+                    <option value="payment">payment (UPI Transaction Ledger)</option>
+                    <option value="app_user">app_user (Aadhaar Verified Users)</option>
+                    <option value="location">location (Highway Hubs &amp; Metro Stops)</option>
+                    <option value="passenger">passenger (Wallets &amp; Profiles)</option>
+                    <option value="driver">driver (RTO Licenses &amp; Ratings)</option>
+                    <option value="vehicle">vehicle (Indian Vehicle Registry)</option>
+                    <option value="review">review (Passenger Trip Reviews)</option>
+                    <option value="customer_support">customer_support (Support Tickets)</option>
+                    <option value="safety_report">safety_report (Safety &amp; Compliance)</option>
+                </select>
+                <input type="text" class="form-input" id="filterPgInput" placeholder="Filter rows by any value..." style="flex: 1; min-width: 200px;">
+            </div>
+
+            <div class="data-table-wrapper" style="max-height: 400px; overflow-y: auto;">
+                <table class="pg-table" id="tablePgInspector">
+                    <thead id="theadPgInspector"></thead>
+                    <tbody id="tbodyPgInspector"></tbody>
+                </table>
+            </div>
+            <div class="pg-footer-info" id="pgFooterInfo">Rows: — | Table: —</div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <div class="brand-icon" style="width:32px;height:32px;font-size:1rem;">🚗</div>
+                    <span class="footer-brand-name">Share<em>Car</em></span>
+                </div>
+                <p class="footer-tagline">India's community carpool platform. Ride together, split travel costs, and reduce highway congestion across India.</p>
+                <div class="footer-dbms-badge">
+                    <span>🐘</span> Powered by PostgreSQL 3NF Architecture
+                </div>
+            </div>
+            <div class="footer-links-group">
+                <div class="footer-col">
+                    <h4>Ride</h4>
+                    <a href="#">Find Intercity Carpool</a>
+                    <a href="#">Daily Tech Commute</a>
+                    <a href="#">Publish an Empty Seat</a>
+                    <a href="#">Driver Dashboard</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Support &amp; Trust</h4>
+                    <a href="#">Aadhaar &amp; RTO KYC Policy</a>
+                    <a href="#">FASTag Toll FAQ</a>
+                    <a href="#">Ladies-Only Safety Charter</a>
+                    <a href="#">UPI Refund Policy</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <a href="#">About ShareCar India</a>
+                    <a href="#">Motor Vehicles Act Compliance</a>
+                    <a href="#">Green &amp; EV Initiatives</a>
+                    <a href="#">Contact Us</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 ShareCar India. All rights reserved. Compliant with Motor Vehicles Act (Cost Sharing).</p>
+            <div class="footer-bottom-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Security &amp; Encryption</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification Hub -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Application Scripts -->
+    <script src="js/db.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
