@@ -108,6 +108,14 @@ body {
     transition: var(--transition);
 }
 
+.brand-icon img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+
 .brand-wrapper:hover .brand-icon { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 175, 245, 0.5); }
 
 .brand-title {

@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="images/logo-transparent.png" alt="ShareCar Logo" width="110" />
+</p>
+
 # ShareCar India — Master DBMS Architecture, Normalization & ACID Project Report
 
 **Project Title**: ShareCar — Intercity & Urban Tech Corridor Carpooling System  

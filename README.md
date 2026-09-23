@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="images/logo-transparent.png" alt="ShareCar Logo" width="130" />
+</p>
+
 # ShareCar — Carpool Management System
 
 A full-stack **carpool management platform** with a rich web interface inspired by a modern carpool-inspired design language, powered by a **PostgreSQL 3NF relational database** architecture.
