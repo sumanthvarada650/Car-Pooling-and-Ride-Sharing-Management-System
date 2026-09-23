@@ -97,6 +97,11 @@ body {
 .brand-icon {
     width: 42px;
     height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    max-width: 42px;
+    max-height: 42px;
+    overflow: hidden;
     background: linear-gradient(135deg, var(--bbc-blue), var(--bbc-blue-deep));
     border-radius: var(--radius-md);
     display: flex;
@@ -106,13 +111,17 @@ body {
     font-size: 1.35rem;
     box-shadow: 0 4px 14px rgba(0, 175, 245, 0.4);
     transition: var(--transition);
+    flex-shrink: 0;
 }
 
 .brand-icon img {
-    width: 26px;
-    height: 26px;
-    object-fit: contain;
-    display: block;
+    width: 26px !important;
+    height: 26px !important;
+    max-width: 26px !important;
+    max-height: 26px !important;
+    object-fit: contain !important;
+    display: block !important;
+    flex-shrink: 0 !important;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
 }
 
